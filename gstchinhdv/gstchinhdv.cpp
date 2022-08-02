@@ -61,9 +61,9 @@
 #endif
 
 #include <gst/gst.h>
-
+#include <iostream>
 #include "gstchinhdv.hpp"
-
+#include <opencv2/opencv.hpp>
 GST_DEBUG_CATEGORY_STATIC (gst_chinhdv_debug);
 #define GST_CAT_DEFAULT gst_chinhdv_debug
 
@@ -236,6 +236,18 @@ gst_chinhdv_chain (GstPad * pad, GstObject * parent, GstBuffer * buf)
 
   filter = GST_CHINHDV (parent);
 
+  GstCaps *caps  = gst_pad_query_caps(pad,NULL);
+  if(gst_caps_is_any(caps)){
+    std::cout << "caps is any" << std::endl;
+  }
+  GstMapInfo map;
+  if (!gst_buffer_map(buf, &map, GST_MAP_READ))
+    std::cout << "problems in reading buf ..." << std::endl;
+  cv::Mat img(1080,1920,CV_8UC3,map.data);
+  cv::flip(img,img,0);
+  exit(0);
+
+  
   if (filter->silent == FALSE)
     g_print ("I'm chinhdv ss plugged, therefore I'm in.\n");
 
